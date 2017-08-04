@@ -66,6 +66,12 @@ class ICMPv6MobilePrefixSolicitation(ICMPv6):
 class ICMPv6MobilePrefixAdvertisement(ICMPv6):
     pass
 
+class NeighborSolicitation(ICMPv6):
+    pass
+
+class NeighborAdvertisement(ICMPv6):
+    pass
+
 def construct_icmpv6_class_map():
     clsmap = {}
     for xtype in ICMPv6Type:
