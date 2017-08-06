@@ -214,9 +214,17 @@ class ICMPv6Type(IntEnum):
     Privateexperimentation3 = 200
     Privateexperimentation4 = 201
 
+class ICMPv6CodeNeighborSolicitation(IntEnum):
+  NeighborSolicitation = 0
+
+class ICMPv6CodeNeighborAdvertisement(IntEnum):
+  NeighborAdvertisement = 0
+
 ICMPv6TypeCodeMap = {
    ICMPv6Type.EchoRequest: ICMPCodeEchoRequest,
-   ICMPv6Type.EchoReply: ICMPCodeEchoReply
+   ICMPv6Type.EchoReply: ICMPCodeEchoReply,
+   ICMPv6Type.NeighborSolicitation: ICMPv6CodeNeighborSolicitation,
+   ICMPv6Type.NeighborAdvertisement: ICMPv6CodeNeighborAdvertisement
 }
 
 # the following checksum function was taken from the POX openflow controller

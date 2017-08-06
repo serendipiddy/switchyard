@@ -1,7 +1,7 @@
 import struct
 from ipaddress import IPv6Address
 
-from .icmp import ICMP, ICMPEchoRequest, ICMPEchoReply
+from .icmp import ICMP, ICMPData, ICMPEchoRequest, ICMPEchoReply
 from .common import ICMPv6Type, ICMPv6TypeCodeMap
 from .common import checksum as csum
 from ..exceptions import *
@@ -10,6 +10,7 @@ from ..exceptions import *
 References:
     http://tools.ietf.org/html/rfc4443
     Stevens, Fall, TCP/IP Illustrated, Vol 1., 2nd Ed.
+    https://notes.shichao.io/tcpv1/ch8/
 '''
 
 
@@ -21,7 +22,9 @@ class ICMPv6(ICMP):
         self._icmptype_from_classtype = ICMPv6TypeFromClass
         self._type = self._valid_types.EchoRequest
         self._code = self._valid_codes_map[self._type].EchoRequest
+        print("type: {}".format(self._type))
         self._icmpdata = ICMPv6ClassFromType(self._type)()
+        print("icmpdata: {}".format(self._icmpdata))
         self._checksum = 0
         # if kwargs are given, must ensure that type gets set
         # before code due to dependencies on validity.
@@ -47,29 +50,34 @@ class ICMPv6(ICMP):
         assert(ip6hdr is not None)
         self._compute_checksum(ip6hdr.src, ip6hdr.dst, raw)
 
+class ICMPv6Data(ICMPData):
+    '''Hack to make the inheritance chain happy and lead into v6 specific differences'''
+    pass
+
 
 class ICMPv6EchoRequest(ICMPEchoRequest):
     pass
 
 class ICMPv6EchoReply(ICMPEchoReply):
     pass
+  
 
-class ICMPv6HomeAgentAddressDiscoveryRequestMessage(ICMPv6):
+class ICMPv6HomeAgentAddressDiscoveryRequestMessage(ICMPv6Data):
     pass
 
-class ICMPv6HomeAgentAddressDiscoveryReplyMessage(ICMPv6):
+class ICMPv6HomeAgentAddressDiscoveryReplyMessage(ICMPv6Data):
     pass
 
-class ICMPv6MobilePrefixSolicitation(ICMPv6):
+class ICMPv6MobilePrefixSolicitation(ICMPv6Data):
     pass
 
-class ICMPv6MobilePrefixAdvertisement(ICMPv6):
+class ICMPv6MobilePrefixAdvertisement(ICMPv6Data):
     pass
 
-class NeighborSolicitation(ICMPv6):
+class ICMPv6NeighborSolicitation(ICMPv6Data):
     pass
 
-class NeighborAdvertisement(ICMPv6):
+#class ICMPv6NeighborAdvertisement(ICMPv6Data):
     pass
 
 def construct_icmpv6_class_map():
