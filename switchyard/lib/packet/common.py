@@ -227,6 +227,14 @@ ICMPv6TypeCodeMap = {
    ICMPv6Type.NeighborAdvertisement: ICMPv6CodeNeighborAdvertisement
 }
 
+class ICMPv6OptionNumber(IntEnum):
+    SourceLinkLayerAddress = 1
+    TargetLinkLayerAddress = 2
+    PrefixInformation = 3
+    RedirectedHeader = 4
+    MTU = 5
+    
+
 # the following checksum function was taken from the POX openflow controller
 
 # Copyright 2011,2012 James McCauley
