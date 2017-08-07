@@ -83,36 +83,32 @@ class ICMPv6Option(object, metaclass=ABCMeta):
     def __str__(self):
         return "{}".format(self.__class__.__name__)
 
-import binascii
-class ICMPv6OptionSourceLinkLayerAddress(ICMPv6Option):
-    #_PACKFMT = '6s'
-  
-    #def __init__(self, address=None):
-        #super().__init__(ICMPv6OptionNumber.SourceLinkLayerAddress)
-        #self._sourcelinklayeraddress = EthAddr(address)
-        
-    #def from_bytes(self, raw):
-        #print("raw: {}".format(binascii.hexlify(raw)))
-        #return len(raw) # length
-      
-    #def to_bytes(self):
-        #return self._sourcelinklayeraddress.packed
-    pass
+class ICMPv6OptionLinkLayerAddress(ICMPv6Option):
+    _PACKFMT = '6s'
 
-class ICMPv6OptionTargetLinkLayerAddress(ICMPv6Option):
-    #_PACKFMT = '6s'
+    def __init__(self, address=None):
+        super().__init__(self._ICMPv6OptionType)
+        self._linklayeraddress = EthAddr(address)
 
-    #def __init__(self, address=None):
-        #super().__init__(ICMPv6OptionNumber.TargetLinkLayerAddress)
-        #self._targetlinklayeraddress = EthAddr(address)
-        
-    #def from_bytes(self, raw):
-        #print("raw: {}".format(binascii.hexlify(raw)))
-        #return len(raw) # length
-  
-    #def to_bytes(self):
-        #return self._targetlinklayeraddress.packed
-    pass
+    def to_bytes(self):
+        v = self._linklayeraddress.packed
+        l = int.to_bytes(int((len(v) + 2)/8), length=1, byteorder=byteorder, signed=False)
+        t = int.to_bytes(self._ICMPv6OptionType, length=1, byteorder=byteorder, signed=False)
+        return t+l+v
+
+    def from_bytes(self, raw):
+        self._linklayeraddress = EthAddr(raw)
+        return len(raw) # length of data unpacked
+
+    def __str__(self):
+        return "{} {}".format(super().__str__(), self._linklayeraddress)
+
+class ICMPv6OptionSourceLinkLayerAddress(ICMPv6OptionLinkLayerAddress):
+    _ICMPv6OptionType = ICMPv6OptionNumber.SourceLinkLayerAddress
+
+class ICMPv6OptionTargetLinkLayerAddress(ICMPv6OptionLinkLayerAddress):
+    _ICMPv6OptionType = ICMPv6OptionNumber.TargetLinkLayerAddress
+
 
 class ICMPv6OptionPrefixInformation(ICMPv6Option):
     pass
@@ -146,10 +142,7 @@ class ICMPv6OptionList(object):
         i = 0
         while i < len(rawbytes):
             opttype = rawbytes[i]
-            optcopied = opttype >> 7         # high order 1 bit
-            optclass = (opttype >> 5) & 0x03 # next 2 bits
-            optnum = opttype & 0x1f          # low-order 5 bits are optnum
-            optnum = ICMPv6OptionNumber(optnum)
+            optnum = ICMPv6OptionNumber(opttype)
             obj = ICMPv6OptionClasses[optnum]()
             eaten = obj.from_bytes(rawbytes[i:])
             i += eaten
@@ -166,8 +159,12 @@ class ICMPv6OptionList(object):
             return raw
         for icmpv6popt in self._options:
             raw += icmpv6popt.to_bytes()
-        padbytes = 4 - (len(raw) % 4)
-        raw += b'\x00'*padbytes
+        # Padding doesn't seem necessary?
+        #   RFC states it should be padded to 'natural 64bit boundaries'
+        #   However, wireshark interprets \x00 as a malformed option field
+        #   So for now, ignore padding
+        # padbytes = 4 - (len(raw) % 4)
+        # raw += b'\x00'*padbytes
         return raw
     
     def append(self, opt):
@@ -284,7 +281,10 @@ class ICMPv6NeighborSolicitation(ICMPv6Data):
         return self._options
     
     def __str__(self):
-        return ''
+        s = "Target address: {}".format(self._targetaddr)
+        if len(self._options) > 0:
+            s = "{} | {}".format(s, self._options)
+        return s
 
 class ICMPv6NeighborAdvertisement(ICMPv6Data):
     __slots__ = ['_R_S_O','_targetaddr']
@@ -302,9 +302,7 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
         super().__init__(**kwargs)
         
     def to_bytes(self):
-        rso = self._routerflag << 7 | self._solicitedflag << 6 | self._overrideflag << 5 
-        rso_byte = int.to_bytes(rso, length=1, byteorder=byteorder, signed=False)
-        return b''.join( (struct.pack(ICMPv6NeighborAdvertisement._PACKFMT, rso_byte, self._targetaddr.packed), self._options.to_bytes(), super().to_bytes()) )
+        return b''.join( (struct.pack(ICMPv6NeighborAdvertisement._PACKFMT, self.get_rso_byte(), self._targetaddr.packed), self._options.to_bytes(), super().to_bytes()) )
 
     def from_bytes(self, raw):
         if len(raw) < self._MINLEN:
@@ -317,6 +315,10 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
         self._overrideflag = (rso & 0x20) >> 5
         self._targetaddr = IPv6Address(fields[0])
         self._options = ICMPv6OptionList.from_bytes(optionbytes)
+
+    def get_rso_byte(self):
+        rso = self._routerflag << 7 | self._solicitedflag << 6 | self._overrideflag << 5
+        return int.to_bytes(rso, length=1, byteorder=byteorder, signed=False)
 
     @property
     def targetaddr(self):
@@ -358,7 +360,10 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
         return self._options
     
     def __str__(self):
-        return ''    
+        s = "Target address: {} flags: {}".format(self._targetaddr, hex(int.from_bytes(self.get_rso_byte(), byteorder=byteorder, signed=False)))
+        if len(self._options) > 0:
+            s = "{} | {}".format(s, self._options)
+        return s
     
 
 def construct_icmpv6_class_map():
