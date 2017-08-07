@@ -220,11 +220,15 @@ class ICMPv6CodeNeighborSolicitation(IntEnum):
 class ICMPv6CodeNeighborAdvertisement(IntEnum):
   NeighborAdvertisement = 0
 
+class ICMPv6CodeRedirectMessage(IntEnum):
+  NeighborAdvertisement = 0
+
 ICMPv6TypeCodeMap = {
    ICMPv6Type.EchoRequest: ICMPCodeEchoRequest,
    ICMPv6Type.EchoReply: ICMPCodeEchoReply,
    ICMPv6Type.NeighborSolicitation: ICMPv6CodeNeighborSolicitation,
-   ICMPv6Type.NeighborAdvertisement: ICMPv6CodeNeighborAdvertisement
+   ICMPv6Type.NeighborAdvertisement: ICMPv6CodeNeighborAdvertisement,
+   ICMPv6Type.RedirectMessage: ICMPv6CodeRedirectMessage
 }
 
 class ICMPv6OptionNumber(IntEnum):
