@@ -225,6 +225,10 @@ class ICMPv6Data(ICMPData):
         self._options = ICMPv6OptionList()
         super().__init__(**kwargs)
 
+    @property
+    def options(self):
+        return self._options
+
 class ICMPv6EchoRequest(ICMPEchoRequest):
     pass
 
@@ -275,10 +279,6 @@ class ICMPv6NeighborSolicitation(ICMPv6Data):
     def targetaddr(self, value):
         print("setting target address: {}".format(IPv6Address(value)))
         self._targetaddr = IPv6Address(value)
-    
-    @property
-    def options(self):
-        return self._options
     
     def __str__(self):
         s = "Target address: {}".format(self._targetaddr)
@@ -354,17 +354,13 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
     def overrideflag(self, value):
         assert value == True or value == False
         self._overrideflag = int(value)
-    
-    @property
-    def options(self):
-        return self._options
-    
+
     def __str__(self):
         s = "Target address: {} flags: {}".format(self._targetaddr, hex(int.from_bytes(self.get_rso_byte(), byteorder=byteorder, signed=False)))
         if len(self._options) > 0:
             s = "{} | {}".format(s, self._options)
         return s
-    
+
 
 def construct_icmpv6_class_map():
     clsmap = {}
