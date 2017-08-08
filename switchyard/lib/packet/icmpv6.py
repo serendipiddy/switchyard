@@ -13,7 +13,6 @@ from sys import byteorder
 References:
     http://tools.ietf.org/html/rfc4443
     Stevens, Fall, TCP/IP Illustrated, Vol 1., 2nd Ed.
-    https://notes.shichao.io/tcpv1/ch8/
 '''
 
 
