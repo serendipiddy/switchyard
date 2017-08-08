@@ -135,7 +135,7 @@ class ICMPv6OptionRedirectedHeader(ICMPv6Option):
             # data_length - 2,  so option header fits into units on 8 octets
             self._packetdata = redirected_packet.to_bytes()[:(data_length-2)]
         else:
-            self._packetdata = none
+            self._packetdata = None
 
     def to_bytes(self):
         v = ICMPv6OptionRedirectedHeader._reservedbytes + self._packetdata
@@ -441,7 +441,7 @@ class ICMPv6RedirectMessage(ICMPv6Data):
         if len(raw) < self._MINLEN:
             raise NotEnoughDataError("Not enough bytes to unpack ICMPv6RedirectMessage object")
         optionbytes = raw[self._MINLEN:]
-        fields = struct.unpack(ICMPv6RedirectMessage._PACKFMT, raw)
+        fields = struct.unpack(ICMPv6RedirectMessage._PACKFMT, raw[:ICMPv6RedirectMessage._MINLEN])
         self._targetaddr = IPv6Address(fields[0])
         self._destinationaddr = IPv6Address(fields[1])
         self._options = ICMPv6OptionList.from_bytes(optionbytes)
