@@ -221,7 +221,7 @@ class ICMPv6CodeNeighborAdvertisement(IntEnum):
   NeighborAdvertisement = 0
 
 class ICMPv6CodeRedirectMessage(IntEnum):
-  NeighborAdvertisement = 0
+  RedirectMessage = 0
 
 ICMPv6TypeCodeMap = {
    ICMPv6Type.EchoRequest: ICMPCodeEchoRequest,
