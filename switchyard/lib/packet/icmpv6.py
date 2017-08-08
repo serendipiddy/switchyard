@@ -308,17 +308,28 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
         if len(raw) < self._MINLEN:
             raise NotEnoughDataError("Not enough bytes to unpack ICMPv6NeighborAdvertisement object")
         optionbytes = raw[ICMPv6NeighborAdvertisement._MINLEN:]
-        fields = struct.unpack(ICMPv6NeighborSolicitation._PACKFMT, raw[:ICMPv6NeighborAdvertisement._MINLEN])
+        fields = struct.unpack(ICMPv6NeighborAdvertisement._PACKFMT, raw[:ICMPv6NeighborAdvertisement._MINLEN])
+        #print('fields[0]: {}'.format(fields[0]))
         rso = int.from_bytes(fields[0], byteorder=byteorder, signed=False)
         self._routerflag = (rso & 0x80) >> 7
         self._solicitedflag = (rso & 0x40) >> 6
         self._overrideflag = (rso & 0x20) >> 5
-        self._targetaddr = IPv6Address(fields[0])
+        self._targetaddr = IPv6Address(fields[1])
         self._options = ICMPv6OptionList.from_bytes(optionbytes)
 
     def get_rso_byte(self):
         rso = self._routerflag << 7 | self._solicitedflag << 6 | self._overrideflag << 5
         return int.to_bytes(rso, length=1, byteorder=byteorder, signed=False)
+
+    def get_rso_str(self):
+        s = ''
+        if self.routerflag:
+          s += 'R'
+        if self.solicitedflag:
+          s += 'S'
+        if self.overrideflag:
+          s += 'O'
+        return s
 
     @property
     def targetaddr(self):
@@ -356,7 +367,9 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
         self._overrideflag = int(value)
 
     def __str__(self):
-        s = "Target address: {} flags: {}".format(self._targetaddr, hex(int.from_bytes(self.get_rso_byte(), byteorder=byteorder, signed=False)))
+        s = "Target address: {} flags: {} ({})".format(self._targetaddr, 
+            hex(int.from_bytes(self.get_rso_byte(), byteorder=byteorder, signed=False)),
+            self.get_rso_str())
         if len(self._options) > 0:
             s = "{} | {}".format(s, self._options)
         return s
