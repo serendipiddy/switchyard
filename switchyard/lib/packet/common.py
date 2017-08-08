@@ -229,6 +229,15 @@ class ICMPv6CodeRouterSolicitation(IntEnum):
 class ICMPv6CodeRouterAdvertisement(IntEnum):
     RouterAdvertisement = 0
 
+class ICMPv6CodeMulticastListenerQuery(IntEnum):
+    MulticastListenerQuery = 0
+
+class ICMPv6CodeMulticastListenerReport(IntEnum):
+    MulticastListenerReport = 0
+
+class ICMPv6CodeMulticastListenerDone(IntEnum):
+    MulticastListenerDone = 0
+
 ICMPv6TypeCodeMap = {
    ICMPv6Type.EchoRequest: ICMPCodeEchoRequest,
    ICMPv6Type.EchoReply: ICMPCodeEchoReply,
@@ -236,7 +245,10 @@ ICMPv6TypeCodeMap = {
    ICMPv6Type.NeighborAdvertisement: ICMPv6CodeNeighborAdvertisement,
    ICMPv6Type.RedirectMessage: ICMPv6CodeRedirectMessage,
    ICMPv6Type.RouterSolicitation: ICMPv6CodeRouterSolicitation,
-   ICMPv6Type.RouterAdvertisement: ICMPv6CodeRouterAdvertisement
+   ICMPv6Type.RouterAdvertisement: ICMPv6CodeRouterAdvertisement,
+   ICMPv6Type.MulticastListenerQuery: ICMPv6CodeMulticastListenerQuery,
+   ICMPv6Type.MulticastListenerReport: ICMPv6CodeMulticastListenerReport,
+   ICMPv6Type.MulticastListenerDone: ICMPv6CodeMulticastListenerDone,
 }
 
 class ICMPv6OptionNumber(IntEnum):

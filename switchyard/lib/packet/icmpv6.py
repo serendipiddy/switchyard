@@ -11,7 +11,8 @@ from sys import byteorder
 
 '''
 References:
-    http://tools.ietf.org/html/rfc4443
+    http://tools.ietf.org/html/rfc4443  (Neighbor Discovery)
+    http://tools.ietf.org/html/rfc2710  (Mulicast Listener Discovery)
     Stevens, Fall, TCP/IP Illustrated, Vol 1., 2nd Ed.
 '''
 
@@ -288,6 +289,21 @@ class ICMPv6MobilePrefixSolicitation(ICMPv6Data):
     pass
 
 class ICMPv6MobilePrefixAdvertisement(ICMPv6Data):
+    pass
+
+class ICMPv6MulticastListenerQuery(ICMPv6Data):
+    pass
+
+class ICMPv6MulticastListenerReport(ICMPv6Data):
+    pass
+
+class ICMPv6MulticastListenerDone(ICMPv6Data):
+    pass
+
+class ICMPv6RouterSolicitation(ICMPv6Data):
+    pass
+
+class ICMPv6RouterAdvertisement(ICMPv6Data):
     pass
 
 class ICMPv6NeighborSolicitation(ICMPv6Data):
