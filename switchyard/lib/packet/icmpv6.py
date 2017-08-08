@@ -114,7 +114,46 @@ class ICMPv6OptionPrefixInformation(ICMPv6Option):
     pass
 
 class ICMPv6OptionRedirectedHeader(ICMPv6Option):
-    pass
+    _PACKFMT = "!xxxxxx"
+    _reservedbytes = b'\x00' * 6
+    _max_pkt_len = 8 * 100  # hack, some arbitrary length, enough to enclose headers
+
+    def __init__(self, redirected_packet=None):
+        if redirected_packet is not None:
+            # todo: Truncate frame to path MTU?!
+            # for now, quick hack to just header and some data
+            data = redirected_packet.to_bytes()
+            data_length = int( (len(data) + 2)/8 ) * 8
+
+            if data_length > self._max_pkt_len:  # cut to 200B
+                data_length = data_length - self._max_pkt_len
+
+            # data_length - 2,  so option header fits into units on 8 octets
+            self._packetdata = redirected_packet.to_bytes()[:(data_length-2)]
+        else:
+            self._packetdata = none
+
+    def to_bytes(self):
+        v = ICMPv6OptionRedirectedHeader._reservedbytes + self._packetdata
+
+        # todo: truncate to 8 octet group
+        data_length = int((len(v) + 2)/8)
+        l = int.to_bytes(data_length, length=1, byteorder=byteorder, signed=False)
+        t = int.to_bytes(ICMPv6OptionNumber.RedirectedHeader, length=1, byteorder=byteorder, signed=False)
+        return t+l+v[:(data_length*8)-2]
+
+    def from_bytes(self, raw):
+        type_ = raw[0]
+        assert type_ == ICMPv6OptionNumber.RedirectedHeader
+        length_ = raw[1] * 8
+        # length of option header (t + l + v = 2 + length_)
+
+        self._packetdata = raw[2:length_]
+        return length_
+
+    def __str__(self):
+        return "{} Enclosed packet ({} bytes)".format(super().__str__(), len(self._packetdata))
+
 
 class ICMPv6OptionMTU(ICMPv6Option):
     pass
@@ -374,6 +413,57 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
             s = "{} | {}".format(s, self._options)
         return s
 
+class ICMPv6RedirectMessage(ICMPv6Data):
+    __slots__ = ['_targetaddr', '_destinationaddr']
+    _PACKFMT = "!xxxx16s16s"
+    _MINLEN = struct.calcsize(_PACKFMT)
+    '''
+        possible options:
+          * target_link_layer_address: link layer address of sending host
+          * redirected_header: link layer address of sending host
+    '''
+
+    def __init__(self, **kwargs):
+        self._targetaddr = IPv6Address("::0")
+        self._destinationaddr = IPv6Address("::0")
+        super().__init__(**kwargs)
+
+    def to_bytes(self):
+        return b''.join( (struct.pack(ICMPv6RedirectMessage._PACKFMT,
+            self._targetaddr.packed, self._destinationaddr.packed),
+            self._options.to_bytes(), super().to_bytes()) )
+
+    def from_bytes(self, raw):
+        if len(raw) < self._MINLEN:
+            raise NotEnoughDataError("Not enough bytes to unpack ICMPv6RedirectMessage object")
+        optionbytes = raw[self._MINLEN:]
+        fields = struct.unpack(ICMPv6RedirectMessage._PACKFMT, raw)
+        self._targetaddr = IPv6Address(fields[0])
+        self._destinationaddr = IPv6Address(fields[1])
+        self._options = ICMPv6OptionList.from_bytes(optionbytes)
+
+    @property
+    def targetaddr(self):
+        return self._targetaddr
+
+    @targetaddr.setter
+    def targetaddr(self, value):
+        self._targetaddr = IPv6Address(value)
+
+    @property
+    def destinationaddr(self):
+        return self._targetaddr
+
+    destinationaddr.setter
+    def destinationaddr(self, value):
+        self._destinationaddr = IPv6Address(value)
+
+    def __str__(self):
+        s = "Target: {} Destination: {}".format(self._targetaddr,
+            self._targetaddr)
+        if len(self._options) > 0:
+            s = "{} | {}".format(s, self._options)
+        return s
 
 def construct_icmpv6_class_map():
     clsmap = {}
