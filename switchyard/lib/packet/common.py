@@ -215,20 +215,28 @@ class ICMPv6Type(IntEnum):
     Privateexperimentation4 = 201
 
 class ICMPv6CodeNeighborSolicitation(IntEnum):
-  NeighborSolicitation = 0
+    NeighborSolicitation = 0
 
 class ICMPv6CodeNeighborAdvertisement(IntEnum):
-  NeighborAdvertisement = 0
+    NeighborAdvertisement = 0
 
 class ICMPv6CodeRedirectMessage(IntEnum):
-  RedirectMessage = 0
+    RedirectMessage = 0
+
+class ICMPv6CodeRouterSolicitation(IntEnum):
+    RouterSolicitation = 0
+
+class ICMPv6CodeRouterAdvertisement(IntEnum):
+    RouterAdvertisement = 0
 
 ICMPv6TypeCodeMap = {
    ICMPv6Type.EchoRequest: ICMPCodeEchoRequest,
    ICMPv6Type.EchoReply: ICMPCodeEchoReply,
    ICMPv6Type.NeighborSolicitation: ICMPv6CodeNeighborSolicitation,
    ICMPv6Type.NeighborAdvertisement: ICMPv6CodeNeighborAdvertisement,
-   ICMPv6Type.RedirectMessage: ICMPv6CodeRedirectMessage
+   ICMPv6Type.RedirectMessage: ICMPv6CodeRedirectMessage,
+   ICMPv6Type.RouterSolicitation: ICMPv6CodeRouterSolicitation,
+   ICMPv6Type.RouterAdvertisement: ICMPv6CodeRouterAdvertisement
 }
 
 class ICMPv6OptionNumber(IntEnum):
