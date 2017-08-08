@@ -84,8 +84,6 @@ class ICMPv6Option(object, metaclass=ABCMeta):
         return "{}".format(self.__class__.__name__)
 
 class ICMPv6OptionLinkLayerAddress(ICMPv6Option):
-    _PACKFMT = '6s'
-
     def __init__(self, address=None):
         super().__init__(self._ICMPv6OptionType)
         self._linklayeraddress = EthAddr(address)
