@@ -97,8 +97,15 @@ class ICMPv6OptionLinkLayerAddress(ICMPv6Option):
         return t+l+v
 
     def from_bytes(self, raw):
-        self._linklayeraddress = EthAddr(raw)
-        return len(raw) # length of data unpacked
+        type_ = raw[0]
+        assert type_ == self._ICMPv6OptionType
+        length_ = raw[1] * 8
+        # length of option header (t + l + v = 2 + length_)
+        # current implementation supports only Ethernet addresses
+        assert (length_ - 2) == len(EthAddr())
+
+        self._linklayeraddress = EthAddr( raw[2:length_] )
+        return length_
 
     def __str__(self):
         return "{} {}".format(super().__str__(), self._linklayeraddress)
