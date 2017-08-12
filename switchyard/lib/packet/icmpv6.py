@@ -323,10 +323,10 @@ class ICMPv6NeighborSolicitation(ICMPv6Data):
         return b''.join( (struct.pack(ICMPv6NeighborSolicitation._PACKFMT, self._targetaddr.packed), self._options.to_bytes(), super().to_bytes()) )
 
     def from_bytes(self, raw):
-        if len(raw) < self._MINLEN:
+        if len(raw) < ICMPv6NeighborSolicitation._MINLEN:
             raise NotEnoughDataError("Not enough bytes to unpack ICMPv6NeighborSolicitation object")
-        optionbytes = raw[self._MINLEN:]
-        fields = struct.unpack(ICMPv6NeighborSolicitation._PACKFMT, raw)
+        optionbytes = raw[ICMPv6NeighborSolicitation._MINLEN:]
+        fields = struct.unpack(ICMPv6NeighborSolicitation._PACKFMT, raw[:ICMPv6NeighborSolicitation._MINLEN])
         self._targetaddr = IPv6Address(fields[0])
         self._options = ICMPv6OptionList.from_bytes(optionbytes)
 
