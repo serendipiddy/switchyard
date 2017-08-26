@@ -18,6 +18,7 @@ class EtherType(IntEnum):
     LLDP = 0x88cc
     x8021AH = 0x88e7
     IEEE8023 = 0x05dc
+    StopAndWait = 253
 
 class ArpHwType(IntEnum):
     Ethernet = 1
@@ -55,6 +56,7 @@ class IPProtocol(IntEnum):
     IPv6Mobility = 135
     MPLSinIP = 137
     IPv6Shim6 = 140
+    StopAndWaitHeader = 253  # IANA private use/experimentation
 
 class IPFragmentFlag(IntEnum):
     NoFragments = 0
