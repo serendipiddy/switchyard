@@ -105,6 +105,14 @@ class ICMPv6OptionLinkLayerAddress(ICMPv6Option):
         self._linklayeraddress = EthAddr( raw[2:length_] )
         return length_
 
+    @property
+    def address(self):
+        return self._linklayeraddress
+
+    @targetaddr.setter
+    def address(self, value):
+        self._linklayeraddress = IPv6Address(value)
+
     def __str__(self):
         return "{} {}".format(super().__str__(), self._linklayeraddress)
 
@@ -323,10 +331,10 @@ class ICMPv6NeighborSolicitation(ICMPv6Data):
         return b''.join( (struct.pack(ICMPv6NeighborSolicitation._PACKFMT, self._targetaddr.packed), self._options.to_bytes(), super().to_bytes()) )
 
     def from_bytes(self, raw):
-        if len(raw) < self._MINLEN:
+        if len(raw) < ICMPv6NeighborSolicitation._MINLEN:
             raise NotEnoughDataError("Not enough bytes to unpack ICMPv6NeighborSolicitation object")
-        optionbytes = raw[self._MINLEN:]
-        fields = struct.unpack(ICMPv6NeighborSolicitation._PACKFMT, raw)
+        optionbytes = raw[ICMPv6NeighborSolicitation._MINLEN:]
+        fields = struct.unpack(ICMPv6NeighborSolicitation._PACKFMT, raw[:ICMPv6NeighborSolicitation._MINLEN])
         self._targetaddr = IPv6Address(fields[0])
         self._options = ICMPv6OptionList.from_bytes(optionbytes)
 
@@ -336,7 +344,6 @@ class ICMPv6NeighborSolicitation(ICMPv6Data):
 
     @targetaddr.setter
     def targetaddr(self, value):
-        print("setting target address: {}".format(IPv6Address(value)))
         self._targetaddr = IPv6Address(value)
     
     def __str__(self):
