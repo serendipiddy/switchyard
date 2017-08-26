@@ -18,7 +18,8 @@ icmp.icmptype = ICMPv6Type.RedirectMessage
 ## OR Directly when initialising the ICMPv6 header
 # icmpv6 = ICMPv6(icmptype=ICMPv6Type.RedirectMessage)
 
-r = ICMPv6RedirectMessage()
+r = ICMPv6RedirectMessage()  
+# or r = icmpv6.icmpdata if already assigned to ICMPv6 object
 r.targetaddr = IPv6Address( "::0" )
 r.options.append( ICMPv6OptionRedirectedHeader( redirected_packet=p ))
 r.options.append( ICMPv6OptionTargetLinkLayerAddress( address=IPv6Address( "::0" ) )
