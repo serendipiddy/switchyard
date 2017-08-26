@@ -109,7 +109,7 @@ class ICMPv6OptionLinkLayerAddress(ICMPv6Option):
     def address(self):
         return self._linklayeraddress
 
-    @targetaddr.setter
+    @address.setter
     def address(self, value):
         self._linklayeraddress = IPv6Address(value)
 
@@ -481,7 +481,7 @@ class ICMPv6RedirectMessage(ICMPv6Data):
     def destinationaddr(self):
         return self._targetaddr
 
-    destinationaddr.setter
+    @destinationaddr.setter
     def destinationaddr(self, value):
         self._destinationaddr = IPv6Address(value)
 
