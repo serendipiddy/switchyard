@@ -22,7 +22,7 @@ r = ICMPv6RedirectMessage()
 # or r = icmpv6.icmpdata if already assigned to ICMPv6 object
 r.targetaddr = IPv6Address( "::0" )
 r.options.append( ICMPv6OptionRedirectedHeader( redirected_packet=p ))
-r.options.append( ICMPv6OptionTargetLinkLayerAddress( address=IPv6Address( "::0" ) )
+r.options.append( ICMPv6OptionTargetLinkLayerAddress( address="00:00:00:00:00:00" )
 
 icmpv6.icmpdata = r
 ```

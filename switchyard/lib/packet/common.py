@@ -56,7 +56,7 @@ class IPProtocol(IntEnum):
     IPv6Mobility = 135
     MPLSinIP = 137
     IPv6Shim6 = 140
-    StopAndWaitHeader = 253  # IANA private use/experimentation
+    StopAndWait= 253
 
 class IPFragmentFlag(IntEnum):
     NoFragments = 0
