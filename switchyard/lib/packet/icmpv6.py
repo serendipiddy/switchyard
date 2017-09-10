@@ -346,6 +346,10 @@ class ICMPv6NeighborSolicitation(ICMPv6Data):
     def targetaddr(self, value):
         self._targetaddr = IPv6Address(value)
     
+    def __eq__(self, other):
+        return self.targetaddr == other.targetaddr and \
+            self.options == other.options
+    
     def __str__(self):
         s = "Target address: {}".format(self._targetaddr)
         if len(self._options) > 0:
@@ -431,6 +435,13 @@ class ICMPv6NeighborAdvertisement(ICMPv6Data):
     def overrideflag(self, value):
         assert value == True or value == False
         self._overrideflag = int(value)
+    
+    def __eq__(self, other):
+        if self.targetaddr != other.targetaddr:
+            return False
+        if self.get_rso_byte != other.get_rso_byte:
+            return False
+        return self.options == other.options
 
     def __str__(self):
         s = "Target address: {} flags: {} ({})".format(self._targetaddr, 
