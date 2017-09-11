@@ -113,6 +113,11 @@ class ICMPv6OptionLinkLayerAddress(ICMPv6Option):
     def address(self, value):
         self._linklayeraddress = IPv6Address(value)
 
+    def __eq__(self, other):
+        return type(self) == type(other) and \
+                self._optnum == other._optnum and \
+                self._linklayeraddress == other._linklayeraddress
+
     def __str__(self):
         return "{} {}".format(super().__str__(), self._linklayeraddress)
 
@@ -264,7 +269,10 @@ class ICMPv6OptionList(object):
             return False
         if len(self._options) != len(other._options):
             return False
-        return self._options == other._options
+        for i in range(self.size()):
+            if not other._options[i] in self._options:
+                return False
+        return True
 
     def __str__(self):
         return "{} ({})".format(self.__class__.__name__,
